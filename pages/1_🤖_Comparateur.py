@@ -5,27 +5,31 @@ import time
 import datetime
 import resend
 
-# 🔑 CONFIGURATIONS ET CLÉS API
-resend.api_key = "re_123456789"
+# Configuration de la page du robot
+st.set_page_config(page_title="Robot Comparateur", page_icon="🤖", layout="centered")
 
-# 💳 REMPLACEZ CECI PAR VOTRE LIEN DE PAIEMENT PAYPAL COMPLET
+# 🔑 CONFIGURATIONS ET CLÉS API (Utilise st.secrets pour la production)
+resend.api_key = "re_123456789"
 PAYPAL_SUBSCRIBE_URL = "https://paypal.com"
 
-st.set_page_config(page_title="Alerte Prix Pro", page_icon="🤖")
+# --- BOUTON RETOUR AU HUB FRIV ---
+if st.button("⬅️ Retour au Hub Principal"):
+    st.switch_page("app.py")
+
 st.title("🤖 Moniteur de Prix pour Entreprises")
+st.write("Surveillez vos concurrents en temps réel et automatisez vos alertes.")
+st.markdown("---")
 
 # --- 🧠 SYSTÈME DE MÉMOIRE CACHÉE (SESSION STATE) ---
 if "connecte" not in st.session_state:
     st.session_state.connecte = False
 
-# --- 1. ÉCRAN DE PAIEMENT PAYPAL ET PAYWALL ---
+# --- 1. ÉCRAN DE PAIEMENT ET PAYWALL DE CET OUTIL ---
 if not st.session_state.connecte:
     st.subheader("💳 Accès au logiciel (Abonnement requis)")
     st.write("Le moniteur de prix tourne en continu pour surveiller vos concurrents et doper vos marges.")
     
-    # Bouton d'achat PayPal officiel (Style primaire Streamlit en couleur jaune/or si possible via CSS, ou bleu standard)
     st.link_button("🟡 S'abonner pour 30$ / mois via PayPal", PAYPAL_SUBSCRIBE_URL, type="primary")
-    
     st.markdown("---")
     
     # Formulaire de déverrouillage après achat
@@ -34,7 +38,6 @@ if not st.session_state.connecte:
         mot_de_passe_client = st.text_input("Entrez votre clé d'activation client reçue après votre achat :", type="password")
         bouton_connexion = st.form_submit_button("Déverrouiller le robot")
         
-        # Ajoutez ici manuellement les clés à donner à vos clients payants
         cles_valides = ["Client_Alex94", "Client_BoutiquePro", "FleuristeMontreal", "MonPremierTest", "Paypal_User_2026"]
         
         if bouton_connexion:
@@ -45,12 +48,10 @@ if not st.session_state.connecte:
                 st.rerun()
             else:
                 st.error("⚠️ Clé d'activation invalide ou paiement non vérifié.")
-                
-    st.stop() # Bloque l'accès au reste de l'application
+                st.stop()
 
-# --- 2. TABLEAU DE BORD DU CLIENT (S'affiche uniquement si connecté est Vrai) ---
+# --- 2. TABLEAU DE BORD DU CLIENT (S'affiche uniquement si connecté) ---
 st.success("🔓 Abonnement Actif ! Bienvenue sur votre tableau de bord.")
-
 if st.button("🔴 Se déconnecter / Fermer la session"):
     st.session_state.connecte = False
     st.rerun()
@@ -89,6 +90,7 @@ if activer:
     ancien_prix = None
     compteur_verif = 0
     
+    # Boucle de surveillance continue
     while datetime.datetime.now() < heure_fin:
         compteur_verif += 1
         zone_logs.markdown(f"🔄 **Vérification en cours...** (Total de scans effectués : `{compteur_verif}`)")
@@ -103,11 +105,13 @@ if activer:
             
             if resultat:
                 prix_actuel = resultat.group(1).strip() + " $"
-                if ancien_prix is None:
+                
+                if json_prix := (ancien_prix is None):
                     ancien_prix = prix_actuel
                     zone_prix.info(f"🤖 Valeur initiale repérée : **{prix_actuel}**")
                 elif prix_actuel != ancien_prix:
                     zone_prix.error(f"🚨 ALERTE : Le prix a changé ! {ancien_prix} -> **{prix_actuel}**")
+                    
                     try:
                         resend.Emails.send({
                             "from": "Robot Prix <onboarding@resend.dev>",
@@ -125,14 +129,17 @@ if activer:
                         st.toast("📧 Courriel d'alerte envoyé avec succès !")
                     except Exception as error_mail:
                         st.sidebar.error(f"Erreur d'envoi du courriel : {error_mail}")
+                    
                     ancien_prix = prix_actuel
                 else:
                     zone_prix.success(f"😴 RAS : Le prix est stable à **{prix_actuel}**")
             else:
                 zone_prix.warning("⚠️ Aucun format de prix détecté lors de ce scan.")
+                
         except Exception as e:
             zone_prix.error(f"❌ Erreur de connexion au site : {e}")
             
-        time.sleep(10)
+        time.sleep(10) # Temps d'attente entre deux scans (10 secondes)
         
     st.warning("⏱️ Le temps de surveillance choisi est écoulé. Le robot s'est arrêté.")
+
