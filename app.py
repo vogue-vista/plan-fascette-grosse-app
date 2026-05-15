@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 # 1. Configuration de la page du Hub Principal
 st.set_page_config(
@@ -8,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Style CSS personnalisé corrigé pour donner un look moderne aux tuiles (style Friv)
+# Style CSS personnalisé pour la grille Friv
 st.markdown("""
     <style>
     div.stButton > button:first-child {
@@ -35,11 +36,10 @@ st.title("🎛️ Tableau de Bord - Stark Enterprise Suite")
 st.write("Bienvenue. Sélectionnez l'outil automatisé dont vous avez besoin pour votre entreprise.")
 st.markdown("---")
 
-# 3. Création de la grille d'applications (2 lignes x 3 colonnes)
+# 3. Création de la grille d'applications (Style Friv)
 row1_col1, row1_col2, row1_col3 = st.columns(3)
 row2_col1, row2_col2, row2_col3 = st.columns(3)
 
-# --- LIGNE 1 ---
 with row1_col1:
     if st.button("🤖\n\nRobot Comparateur\nde Prix", use_container_width=True):
         st.switch_page("pages/1_🤖_Comparateur.py")
@@ -52,18 +52,47 @@ with row1_col3:
     if st.button("📊\n\nCalculateur de\nMarge & Profits", use_container_width=True):
         st.switch_page("pages/3_📊_Calculateur_Marge.py")
 
-# --- LIGNE 2 (Outils en développement pour tes futures entreprises) ---
 with row2_col1:
     if st.button("📈\n\nSuivi des Tendances\ne-Commerce", use_container_width=True):
-        st.info("Cet outil est en cours de déploiement sur les serveurs.")
+        st.info("📈 Cet outil est en cours de développement.")
 
 with row2_col2:
     if st.button("📦\n\nGestionnaire de\nStock Intelligent", use_container_width=True):
-        st.info("Cet outil est en cours de déploiement sur les serveurs.")
+        st.info("📦 Cet outil est en cours de développement.")
 
 with row2_col3:
     if st.button("💬\n\nSupport Client\nAutomatisé IA", use_container_width=True):
-        st.info("Cet outil est en cours de déploiement sur les serveurs.")
+        st.info("💬 Cet outil est en cours de développement.")
 
 st.markdown("---")
-st.caption("Abonnement Professionnel B2B - Protégé par chiffrement local.")
+
+# 4. ZONE DE PAIEMENT PAYPAL VISIBLE
+st.subheader("💳 Activation de votre Licence Professionnelle")
+st.write("Si vos accès sont bloqués, veuillez régulariser votre abonnement de 30.00 $/mois.")
+
+# Met ton vrai Client ID ici s'il est prêt, sinon laisse-le pour les tests
+PAYPAL_CLIENT_ID = "TON_CLIENT_ID_PAYPAL"
+
+paypal_html = f"""
+<div id="paypal-button-container" style="text-align: center;"></div>
+<script src="https://paypal.com{PAYPAL_CLIENT_ID}&currency=USD"></script>
+<script>
+    paypal.Buttons({{
+        createOrder: function(data, actions) {{
+            return actions.order.create({{
+                purchase_units: [{{ amount: {{ value: '30.00' }} }}]
+            }});
+        }},
+        onApprove: function(data, actions) {{
+            return actions.order.capture().then(function(details) {{
+                alert('Paiement validé pour ' + details.payer.name.given_name + ' ! Access débloqué.');
+            }});
+        }}
+    }}).render('#paypal-button-container');
+</script>
+"""
+
+# Injection du bouton jaune de PayPal en bas de la page d'accueil
+components.html(paypal_html, height=150)
+
+st.caption("Abonnement Professionnel B2B - Stark Enterprise Suite.")
