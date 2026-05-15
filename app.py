@@ -8,7 +8,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Style CSS personnalisé pour donner un look moderne aux tuiles (style Friv)
+# Style CSS personnalisé corrigé pour donner un look moderne aux tuiles (style Friv)
 st.markdown("""
     <style>
     div.stButton > button:first-child {
@@ -28,7 +28,7 @@ st.markdown("""
         transform: translateY(-5px);
     }
     </style>
-""", unsafe_allowed_html=True)
+""", unsafe_allow_html=True)
 
 # 2. En-tête du tableau de bord B2B
 st.title("🎛️ Tableau de Bord - Stark Enterprise Suite")
