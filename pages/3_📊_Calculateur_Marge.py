@@ -1,19 +1,22 @@
 import streamlit as st
 
-# SÉCURITÉ : Bloque l'accès si l'utilisateur n'est pas passé par app.py d'abord
+# 1. INITIALISATION DE LA SÉCURITÉ GLOBALE (Obligatoire avant tout affichage)
 if "connecte" not in st.session_state or not st.session_state.connecte:
-    st.error("⚠️ Accès refusé. Veuillez vous connecter sur la page d'accueil.")
-    st.markdown("[Revenir à la page d'accueil](/)")
-    st.stop()
-import streamlit as st
+    st.error("⚠️ Accès refusé. Veuillez vous abonner et vous connecter sur la page d'accueil.")
+    if st.button("⬅️ Aller à la page de paiement"):
+        st.switch_page("app.py")
+    st.stop() # Bloque définitivement l'exécution du reste du code
 
+# 2. CONFIGURATION DE LA PAGE (S'exécute uniquement si l'utilisateur est connecté)
 st.set_page_config(page_title="Calculateur de Marge", page_icon="📊", layout="centered")
 
-if st.button("⬅️ Retour au Hub"):
+# Bouton de retour au Hub Friv
+if st.button("⬅️ Retour au Hub Principal"):
     st.switch_page("app.py")
 
 st.title("📊 Calculateur de Marges & Bénéfices")
 st.write("Vérifiez la viabilité financière de vos produits e-commerce.")
+st.markdown("---")
 
 col1, col2 = st.columns(2)
 
@@ -33,7 +36,6 @@ if prix_vente > 0:
 else:
     marge_pourcentage = 0.0
 
-st.markdown("---")
 st.subheader("📈 Résultats de rentabilité :")
 
 res_col1, res_col2 = st.columns(2)
@@ -48,3 +50,4 @@ elif 0 < marge_pourcentage < 30:
     st.warning("⚠️ Attention, la marge est correcte mais le profit reste faible après taxes.")
 else:
     st.error("❌ Ce produit se vend à perte. Ajustez vos coûts ou augmentez le prix de vente.")
+
