@@ -1,4 +1,11 @@
 import streamlit as st
+
+# SÉCURITÉ : Bloque l'accès si l'utilisateur n'est pas passé par app.py d'abord
+if "connecte" not in st.session_state or not st.session_state.connecte:
+    st.error("⚠️ Accès refusé. Veuillez vous connecter sur la page d'accueil.")
+    st.markdown("[Revenir à la page d'accueil](/)")
+    st.stop()
+import streamlit as st
 import requests
 import re
 import time
