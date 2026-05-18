@@ -1,7 +1,7 @@
 import streamlit as st
 
 # 1. Configuration globale
-st.set_page_config(page_title="Stark Enterprise Suite", page_icon="🎛️", layout="wide")
+st.set_page_config(page_title="Le coeur de TOUTE grande entreprise", page_icon="🎛️", layout="wide")
 
 # Style CSS pour la grille Friv
 st.markdown("""
